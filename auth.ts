@@ -46,6 +46,9 @@ export const {
     authorized({ auth }) {
       console.log('user', auth)
       return !!auth?.user // this ensures there is a logged in user for -every- request
+    },
+    async redirect({ url, baseUrl }) {
+      return baseUrl
     }
   }
   // pages: {
