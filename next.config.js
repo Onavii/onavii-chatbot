@@ -2,16 +2,25 @@
 module.exports = {
   reactStrictMode: true,
   experimental: {
-    serverActions: true,
+    serverActions: true
   },
+  // images: {
+  //   remotePatterns: [
+  //     {
+  //       protocol: 'https',
+  //       hostname: 'avatars.githubusercontent.com',
+  //       port: '',
+  //       pathname: '**'
+  //     },
+  //     {
+  //       protocol: 'https',
+  //       hostname: 'lh3.googleusercontent.com',
+  //       port: '',
+  //       pathname: '**'
+  //     }
+  //   ]
+  // }
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'avatars.githubusercontent.com',
-        port: '',
-        pathname: '**',
-      },
-    ],
-  },
-};
+    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com']
+  }
+}

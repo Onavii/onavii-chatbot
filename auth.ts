@@ -1,5 +1,6 @@
 import NextAuth, { type DefaultSession } from 'next-auth'
-import GitHub from 'next-auth/providers/github'
+import GitHubProvider from 'next-auth/providers/github'
+import GoogleProvider from 'next-auth/providers/google'
 
 declare module 'next-auth' {
   interface Session {
@@ -12,23 +13,42 @@ declare module 'next-auth' {
 
 export const {
   handlers: { GET, POST },
-  auth,
-  CSRF_experimental // will be removed in future
+  auth
+  //CSRF_experimental // will be removed in future
 } = NextAuth({
-  providers: [GitHub],
+  providers: [
+    GitHubProvider({
+      clientId: process.env.AUTH_GITHUB_ID,
+      clientSecret: process.env.AUTH_GITHUB_SECRET
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: 'consent',
+          access_type: 'offline',
+          response_type: 'code'
+        }
+      }
+    })
+  ],
   callbacks: {
     jwt({ token, profile }) {
       if (profile) {
+        console.log('hey')
         token.id = profile.id
         token.image = profile.avatar_url || profile.picture
+        console.log('token', token)
       }
       return token
     },
     authorized({ auth }) {
+      console.log('user', auth)
       return !!auth?.user // this ensures there is a logged in user for -every- request
     }
-  },
-  pages: {
-    signIn: '/sign-in' // overrides the next-auth default signin page https://authjs.dev/guides/basics/pages
   }
+  // pages: {
+  //   signIn: '/sign-in' // overrides the next-auth default signin page https://authjs.dev/guides/basics/pages
+  // }
 })
