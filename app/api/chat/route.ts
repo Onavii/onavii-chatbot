@@ -52,12 +52,7 @@ export async function POST(req: Request) {
     configuration.apiKey = previewToken
   }
 
-  console.log('messages', chatHistory)
   const formattedPreviousMessages = chatHistory.slice(0, -1).map(formatMessage)
-  console.log(
-    'formattedPreviousMessages',
-    formattedPreviousMessages.join('\n\n')
-  )
   const currentMessageContent = chatHistory[chatHistory.length - 1].content
 
   const client = new MongoClient(process.env.MONGODB_URL!) //TODO => move to middleware
@@ -68,7 +63,7 @@ export async function POST(req: Request) {
 
   const chatModel = new ChatOpenAI({
     modelName: 'gpt-4',
-    temperature: 0,
+    temperature: 0.3,
     streaming: true
   })
 
@@ -124,12 +119,44 @@ export async function POST(req: Request) {
     new BytesOutputParser()
   ])
 
-  console.log('currentMessageContent', currentMessageContent)
+  const stream = await chain.stream(
+    {
+      chatHistory: formattedPreviousMessages,
+      question: currentMessageContent
+    },
+    {
+      callbacks: [
+        {
+          async handleLLMEnd(output, runId, parentRunId, tags) {
+            const title = json.messages[0].content.substring(0, 100)
+            const id = json.id ?? nanoid()
+            const createdAt = Date.now()
+            const path = `/chat/${id}`
 
-  const stream = await chain.stream({
-    chatHistory: formattedPreviousMessages,
-    question: currentMessageContent
-  })
+            const payload = {
+              id,
+              title,
+              userId,
+              createdAt,
+              path,
+              messages: [
+                ...chatHistory,
+                {
+                  content: output.generations[0][0].text,
+                  role: 'assistant'
+                }
+              ]
+            }
+            await kv.hmset(`chat:${id}`, payload)
+            await kv.zadd(`user:chat:${userId}`, {
+              score: createdAt,
+              member: `chat:${id}`
+            })
+          }
+        }
+      ]
+    }
+  )
 
   return new StreamingTextResponse(stream)
 }

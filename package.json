@@ -29,6 +29,7 @@
     "ai": "^2.1.6",
     "class-variance-authority": "^0.4.0",
     "clsx": "^1.2.1",
+    "encoding": "^0.1.13",
     "focus-trap-react": "^10.1.1",
     "langchain": "0.0.197-rc.1",
     "mongodb": "^6.3.0",
