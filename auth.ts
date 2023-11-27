@@ -1,6 +1,7 @@
 import NextAuth, { type DefaultSession } from 'next-auth'
 import GitHubProvider from 'next-auth/providers/github'
 import GoogleProvider from 'next-auth/providers/google'
+import CredentialsProvider from 'next-auth/providers/credentials'
 
 declare module 'next-auth' {
   interface Session {
@@ -29,6 +30,38 @@ export const {
           prompt: 'consent',
           access_type: 'offline',
           response_type: 'code'
+        }
+      }
+    }),
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        username: {
+          label: 'Username',
+          type: 'text',
+          placeholder: 'enter you username'
+        },
+        password: {
+          label: 'Password',
+          type: 'password',
+          placeholder: 'enter your password'
+        }
+      },
+      async authorize(credentials) {
+        const sampleUser = {
+          id: '42',
+          name: 'Sample User',
+          username: process.env.SAMPLE_USER_USERNAME,
+          password: process.env.SAMPLE_USER_PASSWORD
+        }
+
+        if (
+          credentials?.username === sampleUser.username &&
+          credentials?.password === sampleUser.password
+        ) {
+          return sampleUser
+        } else {
+          return null
         }
       }
     })

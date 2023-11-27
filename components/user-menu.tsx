@@ -23,6 +23,7 @@ function getUserInitials(name: string) {
   return lastName ? `${firstName[0]}${lastName[0]}` : firstName.slice(0, 2)
 }
 
+//TODO => change image icon to random profile icons
 export function UserMenu({ user }: UserMenuProps) {
   return (
     <div className="flex items-center justify-between">
