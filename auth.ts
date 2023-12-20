@@ -50,13 +50,13 @@ export const {
       async authorize(credentials) {
         const sampleUser = {
           id: '42',
-          name: 'Sample User',
-          username: process.env.SAMPLE_USER_USERNAME,
+          name: 'Sample-User',
+          //username: process.env.SAMPLE_USER_USERNAME,
           password: process.env.SAMPLE_USER_PASSWORD
         }
 
         if (
-          credentials?.username === sampleUser.username &&
+          credentials?.username === sampleUser.name &&
           credentials?.password === sampleUser.password
         ) {
           return sampleUser
@@ -68,6 +68,8 @@ export const {
   ],
   callbacks: {
     jwt({ token, profile }) {
+      console.log('token', token)
+      console.log('profile', profile)
       if (profile) {
         console.log('hey')
         token.id = profile.id
@@ -83,6 +85,9 @@ export const {
     async redirect({ url, baseUrl }) {
       return baseUrl
     }
+  },
+  session: {
+    strategy: 'jwt'
   }
   // pages: {
   //   signIn: '/sign-in' // overrides the next-auth default signin page https://authjs.dev/guides/basics/pages

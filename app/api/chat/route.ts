@@ -63,7 +63,7 @@ export async function POST(req: Request) {
 
   const chatModel = new ChatOpenAI({
     modelName: 'gpt-4',
-    temperature: 0.3,
+    temperature: 0,
     streaming: true
   })
 
@@ -77,13 +77,15 @@ export async function POST(req: Request) {
   const vectorStoreRetriever = vectorStore.asRetriever()
 
   // Create a system & human prompt for the chat model
-  const SYSTEM_TEMPLATE = `Use the following pieces of context to answer the question at the end.
-  If you don't know the answer, just say that you don't know, don't try to make up an answer.
-  ----------------
-  {context}`
+  // const SYSTEM_TEMPLATE = `Use the following pieces of context to answer the question at the end.
+  // If you don't know the answer, just say that you don't know, don't try to make up an answer.
+  // ----------------
+  // {context}`
 
   const questionPrompt = PromptTemplate.fromTemplate(
-    `Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+    `Use the following pieces of context and user data  to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Use as much information from the context below as possible, if the context refers to studies, give credit to clinicaltrials.gov as a the source.
+    ----------------
+    USER DATA: {userData}
     ----------------
     CONTEXT: {context}
     ----------------
@@ -94,11 +96,11 @@ export async function POST(req: Request) {
     Helpful Answer:`
   )
 
-  const messages = [
-    SystemMessagePromptTemplate.fromTemplate(SYSTEM_TEMPLATE),
-    HumanMessagePromptTemplate.fromTemplate('{question}')
-  ]
-  const prompt = ChatPromptTemplate.fromMessages(messages)
+  // const messages = [
+  //   SystemMessagePromptTemplate.fromTemplate(SYSTEM_TEMPLATE),
+  //   HumanMessagePromptTemplate.fromTemplate('{question}')
+  // ]
+  //const prompt = ChatPromptTemplate.fromMessages(messages)
 
   const chain = RunnableSequence.from([
     {
@@ -112,6 +114,11 @@ export async function POST(req: Request) {
         )
         const serialized = formatDocumentsAsString(relevantDocs)
         return serialized
+      },
+      userData: (input: { question: string; chatHistory?: string }) => {
+        return `
+          user's name is Nour Amer, they live in Calgary, Canada. They have been diagnosed with Duchenne Muscular Dystrophy
+        `
       }
     },
     questionPrompt,
