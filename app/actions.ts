@@ -111,10 +111,10 @@ export async function shareChat(chat: Chat) {
 
   const payload = {
     ...chat,
-    sharePath: `/share/123`
+    sharePath: `/share/${chat.id}`
   }
 
-  //await kv.hmset(`chat:${chat.id}`, payload)
+  await kv.hmset(`chat:${chat.id}`, payload)
 
   return payload
 }
