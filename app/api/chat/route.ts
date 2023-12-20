@@ -83,7 +83,8 @@ export async function POST(req: Request) {
   // {context}`
 
   const questionPrompt = PromptTemplate.fromTemplate(
-    `Use the following pieces of context and user data  to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer. Use as much information from the context below as possible, if the context refers to studies, give credit to clinicaltrials.gov as a the source.
+    `Use the following pieces of context and user data to exclusively to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+    Use as much information from the context below as possible, your anser should be as detailed as possible from the context provided.
     ----------------
     USER DATA: {userData}
     ----------------
