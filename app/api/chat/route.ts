@@ -62,7 +62,7 @@ export async function POST(req: Request) {
   const collection = client.db(dbName).collection(collectionName)
 
   const chatModel = new ChatOpenAI({
-    modelName: 'gpt-4',
+    modelName: 'gpt-4-1106-preview',
     temperature: 0,
     streaming: true
   })
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
 
   const questionPrompt = PromptTemplate.fromTemplate(
     `Use the following pieces of context and user data to exclusively to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
-    Use as much information from the context below as possible, your anser should be as detailed as possible from the context provided.
+    Use as much information from the context below as possible, your anser should be as detailed as possible from the context provided. Always try to include contact information in the answer
     ----------------
     USER DATA: {userData}
     ----------------
@@ -118,7 +118,7 @@ export async function POST(req: Request) {
       },
       userData: (input: { question: string; chatHistory?: string }) => {
         return `
-          user's name is Nour Amer, they live in Calgary, Canada. They have been diagnosed with Duchenne Muscular Dystrophy
+          user's name is Nour Amer, they live in Calgary, Canada.
         `
       }
     },
